@@ -6,8 +6,7 @@ An example of a Telegram Bot using Authentication with OpenID Connect and Prisma
 
 ## Features
 - Telegram Chat Bot
--- Authentication (OIDC)
--- Commands
+- Authentication (OIDC)
 - REST-API
 - Database (PrismaJS)
 
