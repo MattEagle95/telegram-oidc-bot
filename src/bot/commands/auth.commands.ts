@@ -4,16 +4,14 @@ import { Issuer, generators } from 'openid-client';
 import { Context } from 'telegraf';
 import { URL } from 'url';
 
-export const authCommand = async (ctx: Context): Promise<void> => {
-  const chatId = ctx.chat?.id;
-
-  if (!chatId) {
-    throw new Error('Chat id not found');
+export async function authCommand(ctx: Context): Promise<void> {
+  if (!ctx.chat) {
+    throw new Error('Chat not found');
   }
 
-  const chat = await DI.prisma.chat.findUnique({
+  const chat = await DI.prisma.chat.findFirstOrThrow({
     where: {
-      id: chatId,
+      id: ctx.chat.id.toString(),
     },
   });
 
@@ -24,13 +22,17 @@ export const authCommand = async (ctx: Context): Promise<void> => {
 
   const codeVerifier = generators.codeVerifier();
   const codeChallenge = generators.codeChallenge(codeVerifier);
-  const redirectUrl = new URL(`auth/cb?chatId=${chatId}`, CONFIG.server.host);
   const issuer = await Issuer.discover(CONFIG.oidc.issuer);
   const oidcClient = new issuer.Client({
     client_id: CONFIG.oidc.clientId,
     client_secret: CONFIG.oidc.clientSecret,
     response_types: ['code'],
   });
+
+  const redirectUrl = new URL(
+    `auth/cb?chatId=${ctx.chat.id}`,
+    CONFIG.server.url,
+  );
   const url = oidcClient.authorizationUrl({
     scope: 'openid',
     redirect_uri: redirectUrl.toString(),
@@ -41,7 +43,7 @@ export const authCommand = async (ctx: Context): Promise<void> => {
   if (chat) {
     await DI.prisma.chat.update({
       where: {
-        id: chatId,
+        id: ctx.chat.id.toString(),
       },
       data: {
         oidcCodeVerifier: codeVerifier,
@@ -50,11 +52,11 @@ export const authCommand = async (ctx: Context): Promise<void> => {
   } else {
     await DI.prisma.chat.create({
       data: {
-        id: chatId,
+        id: ctx.chat.id.toString(),
         oidcCodeVerifier: codeVerifier,
       },
     });
   }
 
   ctx.reply(url);
-};
+}

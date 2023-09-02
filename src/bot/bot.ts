@@ -11,7 +11,7 @@ export class Bot {
   constructor() {
     this.bot = new Telegraf(CONFIG.bot.token);
     this.bot.catch((e, ctx) => {
-      logger.error('Bot error');
+      logger.error('bot error');
       logger.error(e);
       ctx.reply('Error');
     });

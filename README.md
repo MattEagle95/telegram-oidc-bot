@@ -1,11 +1,16 @@
-# Telegram oidc bot
-An example of a Telegram Bot using OpenID Connect and PrismaJS.
+# Telegram example bot
+An example of a Telegram Bot using Authentication with OpenID Connect and PrismaJS.
 
+![Build](https://github.com/matteagle95/telegram-oidc-bot/actions/workflows/ci.yml/badge.svg)
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
 ## Features
-- OIDC Login
-- Ping command
+- Telegram Chat Bot
+-- Authentication (OIDC)
+-- Commands
+-- Scheduled Commands
+- REST-API
+- Database (PrismaJS)
 
 ## Installation
 ### Local

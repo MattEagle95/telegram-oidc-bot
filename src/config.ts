@@ -2,7 +2,7 @@ import { ENV } from './env';
 
 export const CONFIG = {
   server: {
-    host: ENV.SERVER_HOST,
+    url: ENV.SERVER_URL,
     port: ENV.SERVER_PORT,
   },
   bot: {
