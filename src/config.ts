@@ -1,28 +1,6 @@
-import * as dotenv from 'dotenv';
-
-dotenv.config();
-
-export interface Config {
+export const CONFIG = {
   server: {
-    url: string;
-    port: string;
-  };
-  bot: {
-    token: string;
-  };
-  database: {
-    url: string;
-  };
-  oidc: {
-    issuer: string;
-    clientId: string;
-    clientSecret: string;
-  };
-}
-
-export const CONFIG: Config = {
-  server: {
-    url: process.env.SERVER_URL!,
+    host: process.env.SERVER_HOST!,
     port: process.env.SERVER_PORT!,
   },
   bot: {

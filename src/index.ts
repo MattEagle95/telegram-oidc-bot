@@ -1,38 +1,25 @@
-// prettier-ignore
-import { CONFIG } from './config';
+import '@/env';
 
-import { AuthCommand } from './commands/auth-command';
-import { PingCommand } from './commands/ping';
-import { DI, initializeDI } from './di';
-import express from 'express';
-import { Telegraf } from 'telegraf';
+import logger from './logger';
+import { PrismaClient } from '@prisma/client';
 
-import { CallbackController } from '@/controllers/callback-controller';
-
-const startServer = async (): Promise<void> => {
-  const app = express();
-
-  app.use(express.json());
-  app.use('/cb', CallbackController);
-
-  app.listen(CONFIG.server.port, () => {
-    console.log(`⚡️ server is running at ${CONFIG.server.url}`);
-  });
-};
-
-const startBot = async (): Promise<void> => {
-  DI.bot = new Telegraf(CONFIG.bot.token);
-  DI.bot.command('ping', PingCommand);
-  DI.bot.command('auth', AuthCommand);
-  await DI.bot.launch();
-  console.log(`⚡️ ${DI.bot.botInfo?.username} is running`);
-};
+import { Bot } from '@/bot/bot';
+import { DI } from '@/di';
+import { Server } from '@/server/server';
 
 const main = async (): Promise<void> => {
-  await initializeDI();
-  await startServer();
-  await startBot();
-  console.log(`⚡️ running`);
+  const startTime = Date.now();
+  logger.info('starting');
+
+  DI.prisma = new PrismaClient();
+
+  const server = new Server();
+  await server.listen();
+
+  const bot = new Bot();
+  await bot.listen();
+
+  logger.info(`started in ${Date.now() - startTime}ms`);
 };
 
 (async () => {
@@ -40,7 +27,7 @@ const main = async (): Promise<void> => {
     await main();
     await DI.prisma.$disconnect();
   } catch (e) {
-    console.error(e);
+    logger.error(e);
     await DI.prisma.$disconnect();
     process.exit(1);
   }

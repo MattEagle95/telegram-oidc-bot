@@ -1,8 +1,7 @@
-import { CONFIG } from '../config';
-import { DI } from '../di';
-import { generators } from 'openid-client';
+import { CONFIG } from '../../config';
+import { DI } from '../../di';
+import { Issuer, generators } from 'openid-client';
 import { Context } from 'telegraf';
-import { NonemptyReadonlyArray } from 'telegraf/typings/util';
 import { URL } from 'url';
 
 export const AuthCommand = async (ctx: Context): Promise<void> => {
@@ -25,8 +24,14 @@ export const AuthCommand = async (ctx: Context): Promise<void> => {
 
   const codeVerifier = generators.codeVerifier();
   const codeChallenge = generators.codeChallenge(codeVerifier);
-  const redirectUrl = new URL(`cb?chatId=${chatId}`, CONFIG.server.url);
-  const url = DI.oidcClient.authorizationUrl({
+  const redirectUrl = new URL(`cb?chatId=${chatId}`, CONFIG.server.host);
+  const issuer = await Issuer.discover(CONFIG.oidc.issuer);
+  const oidcClient = new issuer.Client({
+    client_id: CONFIG.oidc.clientId,
+    client_secret: CONFIG.oidc.clientSecret,
+    response_types: ['code'],
+  });
+  const url = oidcClient.authorizationUrl({
     scope: 'openid',
     redirect_uri: redirectUrl.toString(),
     code_challenge: codeChallenge,

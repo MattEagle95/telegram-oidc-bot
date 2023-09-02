@@ -1,12 +1,12 @@
 {
-  "name": "telegram-example-bot",
+  "name": "telegram-oidc-bot",
   "version": "1.0.0",
-  "description": "An example of a Telegram Bot using OpenID Connect and Prisma",
+  "description": "An example of a Telegram Bot using OpenID Connect and PrismaJS",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsup src/index.ts --format cjs",
     "clean": "rm -rf node_modules && rm -rf dist",
-    "dev": "tsup src/index.ts --format cjs --watch --onSuccess \"node dist/index.js\"",
+    "dev": "tsup src/index.ts --format cjs --watch --onSuccess \"node dist/index.js\" | pino-pretty",
     "lint": "tsc --noEmit && eslint \"src/*\"",
     "prettier": "prettier --write \"src/*\"",
     "start": "node dist/index.js",
@@ -15,7 +15,7 @@
   "author": "skrambl",
   "license": "MIT",
   "dependencies": {
-    "@prisma/client": "^4.13.0",
+    "@prisma/client": "^4.16.2",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "openid-client": "^5.4.2",

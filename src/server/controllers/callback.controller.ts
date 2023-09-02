@@ -1,5 +1,8 @@
-import { DI } from '../di';
+import { DI } from '../../di';
 import { Request, Response, Router } from 'express';
+import { Issuer } from 'openid-client';
+
+import { CONFIG } from '@/config';
 
 const router = Router();
 
@@ -15,9 +18,14 @@ router.get('/', async (req: Request, res: Response) => {
       id: chatId,
     },
   });
-
-  const params = DI.oidcClient.callbackParams(req);
-  const tokenSet = await DI.oidcClient.callback(
+  const issuer = await Issuer.discover(CONFIG.oidc.issuer);
+  const oidcClient = new issuer.Client({
+    client_id: CONFIG.oidc.clientId,
+    client_secret: CONFIG.oidc.clientSecret,
+    response_types: ['code'],
+  });
+  const params = oidcClient.callbackParams(req);
+  const tokenSet = await oidcClient.callback(
     `http://localhost:3000/cb?chatId=${chatId}`,
     params,
     { code_verifier: chat.oidcCodeVerifier! },
@@ -34,8 +42,8 @@ router.get('/', async (req: Request, res: Response) => {
     },
   });
 
-  DI.bot.telegram.sendMessage(chatId, 'Authenticated!');
-  res.redirect(`tg://resolve?domain=${DI.bot.botInfo?.username}`);
+  DI.bot.bot.telegram.sendMessage(chatId, 'Authenticated!');
+  res.redirect(`tg://resolve?domain=${DI.bot.bot.botInfo?.username}`);
 });
 
 export { router as CallbackController };
