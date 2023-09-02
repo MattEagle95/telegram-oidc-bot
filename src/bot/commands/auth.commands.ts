@@ -4,7 +4,7 @@ import { Issuer, generators } from 'openid-client';
 import { Context } from 'telegraf';
 import { URL } from 'url';
 
-export const AuthCommand = async (ctx: Context): Promise<void> => {
+export const authCommand = async (ctx: Context): Promise<void> => {
   const chatId = ctx.chat?.id;
 
   if (!chatId) {
@@ -24,7 +24,7 @@ export const AuthCommand = async (ctx: Context): Promise<void> => {
 
   const codeVerifier = generators.codeVerifier();
   const codeChallenge = generators.codeChallenge(codeVerifier);
-  const redirectUrl = new URL(`cb?chatId=${chatId}`, CONFIG.server.host);
+  const redirectUrl = new URL(`auth/cb?chatId=${chatId}`, CONFIG.server.host);
   const issuer = await Issuer.discover(CONFIG.oidc.issuer);
   const oidcClient = new issuer.Client({
     client_id: CONFIG.oidc.clientId,

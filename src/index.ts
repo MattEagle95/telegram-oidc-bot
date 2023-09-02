@@ -13,11 +13,11 @@ const main = async (): Promise<void> => {
 
   DI.prisma = new PrismaClient();
 
-  const server = new Server();
-  await server.listen();
+  DI.server = new Server();
+  await DI.server.listen();
 
-  const bot = new Bot();
-  await bot.listen();
+  DI.bot = new Bot();
+  DI.bot.listen();
 
   logger.info(`started in ${Date.now() - startTime}ms`);
 };

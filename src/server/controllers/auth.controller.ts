@@ -6,7 +6,7 @@ import { CONFIG } from '@/config';
 
 const router = Router();
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/cb', async (req: Request, res: Response) => {
   const chatId = Number(req.query.chatId);
 
   if (!chatId) {
@@ -46,4 +46,4 @@ router.get('/', async (req: Request, res: Response) => {
   res.redirect(`tg://resolve?domain=${DI.bot.bot.botInfo?.username}`);
 });
 
-export { router as CallbackController };
+export { router as authController };

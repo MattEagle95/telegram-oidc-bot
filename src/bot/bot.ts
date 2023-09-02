@@ -1,5 +1,5 @@
-import { AuthCommand } from './commands/auth.commands';
-import { PingCommand } from './commands/ping.commands';
+import { authCommand } from './commands/auth.commands';
+import { pingCommand } from './commands/ping.commands';
 import { Telegraf } from 'telegraf';
 
 import { CONFIG } from '@/config';
@@ -10,12 +10,18 @@ export class Bot {
 
   constructor() {
     this.bot = new Telegraf(CONFIG.bot.token);
-    this.bot.command('ping', PingCommand);
-    this.bot.command('auth', AuthCommand);
+    this.bot.catch((e, ctx) => {
+      logger.error('Bot error');
+      logger.error(e);
+      ctx.reply('Error');
+    });
+
+    this.bot.command('ping', pingCommand);
+    this.bot.command('auth', authCommand);
   }
 
-  async listen(): Promise<void> {
+  listen(): void {
     this.bot.launch();
-    logger.info(`bot is running as ${this.bot.botInfo?.username}`);
+    logger.info(`bot is running`);
   }
 }

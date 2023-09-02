@@ -1,17 +1,19 @@
+import { ENV } from './env';
+
 export const CONFIG = {
   server: {
-    host: process.env.SERVER_HOST!,
-    port: process.env.SERVER_PORT!,
+    host: ENV.SERVER_HOST,
+    port: ENV.SERVER_PORT,
   },
   bot: {
-    token: process.env.BOT_TOKEN!,
+    token: ENV.BOT_TOKEN,
   },
   database: {
-    url: process.env.DATABASE_URL!,
+    url: ENV.DATABASE_URL,
   },
   oidc: {
-    issuer: process.env.OIDC_ISSUER!,
-    clientId: process.env.OIDC_CLIENT_ID!,
-    clientSecret: process.env.OIDC_CLIENT_SECRET!,
+    issuer: ENV.OIDC_ISSUER,
+    clientId: ENV.OIDC_CLIENT_ID,
+    clientSecret: ENV.OIDC_CLIENT_SECRET,
   },
 };
