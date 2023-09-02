@@ -1,10 +1,10 @@
+import { HttpError } from '../errors/http.error';
 import { authController } from './controllers/auth.controller';
 import { pingController } from './controllers/ping.controller';
-import { BadRequestError } from './errors/bad-request.error';
 import express, { NextFunction, Request, Response } from 'express';
 import http from 'http';
 
-import { CONFIG } from '@/config';
+import { ENV } from '@/env';
 import logger from '@/logger';
 
 export class Server {
@@ -23,9 +23,9 @@ export class Server {
   async listen(): Promise<http.Server> {
     return new Promise((resolve, reject) => {
       this.app
-        .listen(CONFIG.server.port)
+        .listen(ENV.SERVER_PORT)
         .once('listening', (server: http.Server) => {
-          logger.info(`server is running at ${CONFIG.server.url}`);
+          logger.info(`server is running at ${ENV.SERVER_URL}`);
           this.server = server;
           resolve(server);
         })
@@ -36,10 +36,8 @@ export class Server {
   errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
     logger.error(err);
 
-    if (err instanceof BadRequestError) {
-      return res
-        .status(err.statusCode)
-        .send(`${BadRequestError.name}\\n${err.message}`);
+    if (err instanceof HttpError) {
+      return res.status(err.statusCode).send(`${err.name}\\n${err.message}`);
     }
 
     res.status(500).send('InternalServerError');

@@ -20,6 +20,7 @@
     "express": "^4.18.2",
     "openid-client": "^5.4.3",
     "pino": "^8.15.0",
+    "rate-limiter-flexible": "^3.0.0",
     "telegraf": "^4.13.1",
     "zod": "^3.22.2"
   },

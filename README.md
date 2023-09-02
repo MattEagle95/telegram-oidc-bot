@@ -15,57 +15,57 @@ An example of a Telegram Bot using Authentication with OpenID Connect and Prisma
 Clone the project
 
 ```bash
-  git clone https://github.com/MattEagle95/telegram-oidc-bot
+git clone https://github.com/MattEagle95/telegram-oidc-bot
 ```
 
 Go to the project directory
 
 ```bash
-  cd telegram-oidc-bot
+cd telegram-oidc-bot
 ```
 
 Install dependencies
 
 ```bash
-  npm install
+npm install
 ```
 
 Start the server
 
 ```bash
-  npm run start
+npm run start
 ```
 
 ### Docker
 Clone the project
 
 ```bash
-  git clone https://github.com/MattEagle95/telegram-oidc-bot
+git clone https://github.com/MattEagle95/telegram-oidc-bot
 ```
 
-Go to the project directory
+Create and .env file with the contents below or clone the project (as describe in Installation - Local)
 
 ```bash
-  cd telegram-oidc-bot
+cd telegram-oidc-bot
 ```
 
 Run docker
 
 ```bash
-  docker run telegram-oidc-bot
+docker run telegram-oidc-bot
 ```
 
 ### Docker compose
 Clone the project
 
 ```bash
-  git clone https://github.com/MattEagle95/telegram-oidc-bot
+git clone https://github.com/MattEagle95/telegram-oidc-bot
 ```
 
 Go to the project directory
 
 ```bash
-  cd telegram-oidc-bot
+cd telegram-oidc-bot
 ```
 
 Run docker compose
@@ -93,7 +93,7 @@ volumes:
 ```
 
 ```bash
-  docker compose up
+docker compose up
 ```
     
 ## Environment Variables

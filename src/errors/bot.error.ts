@@ -1,7 +1,4 @@
-export class BadRequestError extends Error {
-  name = 'BadRequestError';
-  statusCode = 400;
-
+export class BotError extends Error {
   constructor(message = '', ...args: any) {
     super(message, ...args);
     this.message = message;
