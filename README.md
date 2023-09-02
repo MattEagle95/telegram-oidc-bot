@@ -1,46 +1,65 @@
-
-# Telegram Example Bot
-
-An example of a Telegram Bot using OpenID Connect and Prisma.
-
-
-## Badges
-
-Add badges from somewhere like: [shields.io](https://shields.io/)
+# Telegram oidc bot
+An example of a Telegram Bot using OpenID Connect and PrismaJS.
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
-[![AGPL License](https://img.shields.io/badge/license-AGPL-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)
-
 
 ## Features
-
-- Light/dark mode toggle
-- Live previews
-- Fullscreen mode
-- Cross platform
-
+- OIDC Login
+- Ping command
 
 ## Installation
+### Local
+```bash
+  npm install
+  npm start
+```
 
-Install my-project with npm
+### Docker
+```bash
+  docker run telegram-oidc-bot
+```
+
+### Docker compose
+```
+version: "3.9"
+
+services:
+  telegramBot:
+    container_name: "telegram-bot"
+    build: .
+    restart: always
+    healthcheck:
+      test: curl --fail http://localhost:3000 || exit 1
+      interval: 60s
+      timeout: 5s
+      retries: 3
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/data
+
+volumes:
+  data: {}
+```
 
 ```bash
-  npm install my-project
-  cd my-project
+  docker compose up
 ```
     
 ## Environment Variables
-
 To run this project, you will need to add the following environment variables to your .env file
 
-`API_KEY`
+```bash
+SERVER_URL="http://localhost:3000" # the url of this bot
+SERVER_PORT="3000" # the port of this bot
+DATABASE_URL="file:./dev.db"
+BOT_TOKEN="6141918853:AAHoG1ImQERz1Rn2dtnalGB5jryHZdr_-X8"
+OIDC_ISSUER="https://auth.amalotia.com/realms/master"
+OIDC_CLIENT_ID="telegram"
+OIDC_CLIENT_SECRET="1Us3DgOl9H47L2n7a6wtR0AOMOPs3tKM"
+```
 
-`ANOTHER_API_KEY`
-
-
-## Run Locally
-
+## Development
 Clone the project
 
 ```bash
@@ -50,7 +69,7 @@ Clone the project
 Go to the project directory
 
 ```bash
-  cd my-project
+  cd telegram-oidc-bot
 ```
 
 Install dependencies
@@ -65,17 +84,5 @@ Start the server
   npm run start
 ```
 
-
-## Deployment
-
-To deploy this project run
-
-```bash
-  npm run deploy
-```
-
-
 ## License
-
 [MIT](https://choosealicense.com/licenses/mit/)
-
