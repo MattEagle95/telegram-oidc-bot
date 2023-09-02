@@ -8,23 +8,69 @@ An example of a Telegram Bot using Authentication with OpenID Connect and Prisma
 - Telegram Chat Bot
 -- Authentication (OIDC)
 -- Commands
--- Scheduled Commands
 - REST-API
 - Database (PrismaJS)
 
 ## Installation
 ### Local
+Clone the project
+
+```bash
+  git clone https://github.com/MattEagle95/telegram-oidc-bot
+```
+
+Go to the project directory
+
+```bash
+  cd telegram-oidc-bot
+```
+
+Install dependencies
+
 ```bash
   npm install
-  npm start
+```
+
+Start the server
+
+```bash
+  npm run start
 ```
 
 ### Docker
+Clone the project
+
+```bash
+  git clone https://github.com/MattEagle95/telegram-oidc-bot
+```
+
+Go to the project directory
+
+```bash
+  cd telegram-oidc-bot
+```
+
+Run docker
+
 ```bash
   docker run telegram-oidc-bot
 ```
 
 ### Docker compose
+Clone the project
+
+```bash
+  git clone https://github.com/MattEagle95/telegram-oidc-bot
+```
+
+Go to the project directory
+
+```bash
+  cd telegram-oidc-bot
+```
+
+Run docker compose
+
 ```
 version: "3.9"
 
@@ -52,7 +98,8 @@ volumes:
 ```
     
 ## Environment Variables
-To run this project, you will need to add the following environment variables to your .env file
+To run this project, you will need to add the following environment variables to your .env file.
+You can use the .env.example file as example.
 
 ```bash
 SERVER_URL="http://localhost:3000" # the url of this bot
@@ -62,31 +109,6 @@ BOT_TOKEN="6141918853:AAHoG1ImQERz1Rn2dtnalGB5jryHZdr_-X8"
 OIDC_ISSUER="https://auth.amalotia.com/realms/master"
 OIDC_CLIENT_ID="telegram"
 OIDC_CLIENT_SECRET="1Us3DgOl9H47L2n7a6wtR0AOMOPs3tKM"
-```
-
-## Development
-Clone the project
-
-```bash
-  git clone https://link-to-project
-```
-
-Go to the project directory
-
-```bash
-  cd telegram-oidc-bot
-```
-
-Install dependencies
-
-```bash
-  npm install
-```
-
-Start the server
-
-```bash
-  npm run start
 ```
 
 ## License

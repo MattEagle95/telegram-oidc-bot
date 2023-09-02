@@ -37,7 +37,7 @@ export class Server {
     logger.error(err);
 
     if (err instanceof BadRequestError) {
-      res
+      return res
         .status(err.statusCode)
         .send(`${BadRequestError.name}\\n${err.message}`);
     }
