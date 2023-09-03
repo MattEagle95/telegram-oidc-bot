@@ -77,8 +77,8 @@ export class Bot {
 
     this.bot.telegram.setMyCommands(commands);
 
-    this.bot.command('auth_secret', authMiddleware(), authSecretCommand);
-    this.bot.command('auth_oidc', authMiddleware(), authOIDCCommand);
+    this.bot.command('auth_secret', authSecretCommand);
+    this.bot.command('auth_oidc', authOIDCCommand);
     this.bot.command('ping', pingCommand);
     this.bot.command('start', authSecretCommand);
     this.bot.command('help', authSecretCommand);

@@ -4,8 +4,7 @@ import { Context } from 'telegraf';
 import { URL } from 'url';
 
 import { ENV, ENV_AUTH_OIDC } from '@/env';
-import { BotError } from '@/errors/bot.error';
-import { commandArgs, commandHandler } from '@/utils/utils';
+import { commandHandler } from '@/utils/utils';
 
 export const authSecretCommand = commandHandler(
   async (ctx: Context): Promise<void> => {
@@ -17,34 +16,12 @@ export const authSecretCommand = commandHandler(
       return;
     }
 
-    const args = commandArgs(ctx);
-    const secret = args[0];
+    const url = new URL(
+      `auth/secret?chatId=${ctx.message.chat.id}`,
+      ENV.SERVER_URL,
+    );
 
-    if (!secret) {
-      throw new BotError('Secret required');
-    }
-
-    if (secret !== ENV.AUTH_SECRET) {
-      throw new BotError('Secret wrong');
-    }
-
-    const data = {
-      verifiedBy: 'secret',
-      verifiedAt: new Date(),
-    };
-
-    await DI.prisma.chat.upsert({
-      where: {
-        id: ctx.message.from.id,
-      },
-      update: data,
-      create: {
-        id: ctx.message.from.id,
-        ...data,
-      },
-    });
-
-    ctx.reply('Authenticated!');
+    ctx.reply(url.toString());
   },
 );
 
@@ -70,7 +47,7 @@ export const authOIDCCommand = commandHandler(
     });
 
     const redirectUrl = new URL(
-      `auth/cb?chatId=${ctx.message.from.id}`,
+      `auth/oidc/cb?chatId=${ctx.message.from.id}`,
       ENV.SERVER_URL,
     );
     const url = oidcClient.authorizationUrl({

@@ -1,7 +1,8 @@
 import { DI } from '../../di';
 import { HttpError } from '../../errors/http.error';
-import { Request, Response, Router } from 'express';
+import express, { Request, Response, Router } from 'express';
 import { Issuer } from 'openid-client';
+import path from 'path';
 import z from 'zod';
 
 import { ENV } from '@/env';
@@ -9,18 +10,66 @@ import { routeHandler, routeParser } from '@/utils/utils';
 
 const router = Router();
 
-const cbSchema = z.object({
+router.use(
+  '/secret',
+  express.static(path.join(__dirname, 'public', 'auth', 'secret')),
+);
+
+const secretCbSchema = z.object({
+  body: z.object({
+    chatId: z.coerce.number(),
+    secret: z.string(),
+  }),
+});
+
+router.post(
+  '/secret/cb',
+  routeHandler(async (req: Request, res: Response) => {
+    const {
+      body: { chatId, secret },
+    } = await routeParser(secretCbSchema, req);
+
+    if (!ENV.AUTH_SECRET) {
+      throw new Error();
+    }
+
+    if (secret !== ENV.AUTH_SECRET) {
+      throw new HttpError('Unauthenticated', 403, 'UnauthenticatedError');
+    }
+
+    const data = {
+      verifiedBy: 'secret',
+      verifiedAt: new Date(),
+    };
+
+    await DI.prisma.chat.upsert({
+      where: {
+        id: chatId,
+      },
+      update: data,
+      create: {
+        id: chatId,
+        ...data,
+      },
+    });
+
+    DI.bot.bot.telegram.sendMessage(chatId, 'Authenticated!');
+    res.redirect(`tg://resolve?domain=${DI.bot.bot.botInfo?.username}`);
+  }),
+);
+
+const oidcCbSchema = z.object({
   query: z.object({
     chatId: z.number(),
   }),
 });
 
 router.get(
-  '/cb',
+  '/oidc/cb',
   routeHandler(async (req: Request, res: Response) => {
     const {
       query: { chatId },
-    } = await routeParser(cbSchema, req);
+    } = await routeParser(oidcCbSchema, req);
 
     if (
       !ENV.AUTH_OIDC_ISSUER ||
@@ -48,7 +97,7 @@ router.get(
     });
     const params = oidcClient.callbackParams(req);
     const tokenSet = await oidcClient.callback(
-      `${ENV.SERVER_URL}/auth/cb?chatId=${chatId}`,
+      `${ENV.SERVER_URL}/auth/oidc/cb?chatId=${chatId}`,
       params,
       { code_verifier: chat.oidcCodeVerifier },
     );
@@ -57,13 +106,20 @@ router.get(
       throw new HttpError('No access token', 400, 'BadRequestError');
     }
 
-    await DI.prisma.chat.update({
+    const data = {
+      oidcCodeVerifier: undefined,
+      verifiedBy: 'oidc',
+      verifiedAt: new Date(),
+    };
+
+    await DI.prisma.chat.upsert({
       where: {
         id: chatId,
       },
-      data: {
-        oidcCodeVerifier: undefined,
-        verifiedAt: new Date(),
+      update: data,
+      create: {
+        id: chatId,
+        ...data,
       },
     });
 
