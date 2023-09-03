@@ -1,4 +1,6 @@
-import { authSecret } from './commands/auth.commands';
+import { authOIDCCommand, authSecretCommand } from './commands/auth.commands';
+import { pingCommand } from './commands/ping.commands';
+import { authMiddleware } from './middleware/auth.middleware';
 import { rateLimitMiddleware } from './middleware/rate-limit.middleware';
 import { Telegraf } from 'telegraf';
 import { BotCommand } from 'telegraf/typings/core/types/typegram';
@@ -45,44 +47,41 @@ export class Bot {
       }),
     );
 
-    const commands: (BotCommand & { fn: any })[] = [];
+    const commands: BotCommand[] = [];
     if (ENV.AUTH_SECRET) {
       commands.push({
         command: 'auth_secret',
         description: 'Authenticate',
-        fn: authSecret,
       });
     }
     if (ENV_AUTH_OIDC) {
       commands.push({
         command: 'auth_oidc',
         description: 'Authenticate',
-        fn: authSecret,
       });
     }
     commands.push(
       {
         command: 'ping',
         description: 'Pong',
-        fn: authSecret,
       },
       {
         command: 'start',
         description: 'start',
-        fn: authSecret,
       },
       {
         command: 'help',
         description: 'help',
-        fn: authSecret,
       },
     );
 
-    commands.forEach((command) => {
-      this.bot.command(command.command, command.fn);
-    });
-
     this.bot.telegram.setMyCommands(commands);
+
+    this.bot.command('auth_secret', authMiddleware(), authSecretCommand);
+    this.bot.command('auth_oidc', authMiddleware(), authOIDCCommand);
+    this.bot.command('ping', pingCommand);
+    this.bot.command('start', authSecretCommand);
+    this.bot.command('help', authSecretCommand);
   }
 
   listen(): void {

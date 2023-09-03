@@ -1,12 +1,14 @@
 import { DI } from "@/di";
 import { ENV } from "@/env";
 import { BotError } from "@/errors/bot.error";
+import { commandHandler } from "@/utils/utils";
 import { Context } from "telegraf";
 
-export const authMiddleware = async (ctx: Context, next: any) => {
-  if (!ctx.message) {
-    return;
-}
+export const authMiddleware = () => {
+  return commandHandler(async (ctx: Context, next: any) => {
+    if (!ctx.message) {
+      return;
+    }
 
     let chat;
     try {
@@ -22,4 +24,7 @@ export const authMiddleware = async (ctx: Context, next: any) => {
     } catch(e) {
       throw new BotError('Unauthenticated');
     }
+
+    next();
   }
+)}

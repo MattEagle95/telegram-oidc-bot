@@ -1,5 +1,7 @@
+import { commandHandler } from '@/utils/utils';
 import { Context } from 'telegraf';
 
-export const pingCommand = async (ctx: Context): Promise<void> => {
+export const pingCommand = commandHandler(
+  async (ctx: Context): Promise<void> => {
   ctx.reply('pong');
-};
+});
