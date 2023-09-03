@@ -3,35 +3,13 @@ import { Issuer, generators } from 'openid-client';
 import { Context } from 'telegraf';
 import { URL } from 'url';
 
-import { ENV } from '@/env';
+import { ENV, ENV_AUTH_OIDC } from '@/env';
 import { BotError } from '@/errors/bot.error';
-import { authMethods, commandArgs } from '@/utils/utils';
+import { commandArgs } from '@/utils/utils';
 
-export async function authCommand(ctx: Context): Promise<void> {
-  if (!ctx.chat) {
-    throw new BotError('Chat not found');
-  }
-
-  const args = commandArgs(ctx);
-  const method = args[0];
-
-  switch (method) {
-    case 'secret':
-      await authSecret(ctx);
-      break;
-
-    case 'oidc':
-      await authOIDC(ctx);
-      break;
-
-    default:
-      throw new BotError(`Authentication method required (${authMethods()})`);
-  }
-}
-
-async function authSecret(ctx: Context): Promise<void> {
-  if (!ctx.chat) {
-    throw new BotError('Chat not found');
+export async function authSecret(ctx: Context): Promise<void> {
+  if (!ctx.message) {
+    return;
   }
 
   if (!ENV.AUTH_SECRET) {
@@ -56,11 +34,11 @@ async function authSecret(ctx: Context): Promise<void> {
 
   await DI.prisma.chat.upsert({
     where: {
-      id: ctx.chat.id,
+      id: ctx.message.from.id,
     },
     update: data,
     create: {
-      id: ctx.chat.id,
+      id: ctx.message.from.id,
       ...data,
     },
   });
@@ -68,29 +46,30 @@ async function authSecret(ctx: Context): Promise<void> {
   ctx.reply('Authenticated!');
 }
 
-async function authOIDC(ctx: Context): Promise<void> {
-  if (!ctx.chat) {
-    throw new BotError('Chat not found');
+export async function authOIDC(ctx: Context): Promise<void> {
+  if (!ctx.message) {
+    return;
   }
 
-  if (
-    !ENV.AUTH_OIDC_ISSUER ||
-    !ENV.AUTH_OIDC_CLIENT_ID ||
-    !ENV.AUTH_OIDC_CLIENT_SECRET
-  ) {
+  if (!ENV_AUTH_OIDC) {
     return;
   }
 
   const codeVerifier = generators.codeVerifier();
   const codeChallenge = generators.codeChallenge(codeVerifier);
-  const issuer = await Issuer.discover(ENV.AUTH_OIDC_ISSUER);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const issuer = await Issuer.discover(ENV.AUTH_OIDC_ISSUER!);
   const oidcClient = new issuer.Client({
-    client_id: ENV.AUTH_OIDC_CLIENT_ID,
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    client_id: ENV.AUTH_OIDC_CLIENT_ID!,
     client_secret: ENV.AUTH_OIDC_CLIENT_SECRET,
     response_types: ['code'],
   });
 
-  const redirectUrl = new URL(`auth/cb?chatId=${ctx.chat.id}`, ENV.SERVER_URL);
+  const redirectUrl = new URL(
+    `auth/cb?chatId=${ctx.message.from.id}`,
+    ENV.SERVER_URL,
+  );
   const url = oidcClient.authorizationUrl({
     scope: 'openid',
     redirect_uri: redirectUrl.toString(),
@@ -104,11 +83,11 @@ async function authOIDC(ctx: Context): Promise<void> {
 
   await DI.prisma.chat.upsert({
     where: {
-      id: ctx.chat.id,
+      id: ctx.message.from.id,
     },
     update: data,
     create: {
-      id: ctx.chat.id,
+      id: ctx.message.from.id,
       ...data,
     },
   });

@@ -16,3 +16,7 @@ const envSchema = z.object({
 });
 
 export const ENV = envSchema.parse(process.env);
+export const ENV_AUTH_OIDC =
+  ENV.AUTH_OIDC_ISSUER &&
+  ENV.AUTH_OIDC_CLIENT_ID &&
+  ENV.AUTH_OIDC_CLIENT_SECRET;

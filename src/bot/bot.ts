@@ -1,9 +1,9 @@
-import { authCommand } from './commands/auth.commands';
-import { pingCommand } from './commands/ping.commands';
+import { authSecret } from './commands/auth.commands';
 import { rateLimitMiddleware } from './middleware/rate-limit.middleware';
 import { Telegraf } from 'telegraf';
+import { BotCommand } from 'telegraf/typings/core/types/typegram';
 
-import { ENV } from '@/env';
+import { ENV, ENV_AUTH_OIDC } from '@/env';
 import { BotError } from '@/errors/bot.error';
 import logger from '@/logger';
 
@@ -26,10 +26,12 @@ export class Bot {
 
     this.bot.use(
       rateLimitMiddleware({
-        points: 30,
+        points: 15,
         duration: 60,
-        blockDuration: 15 * 60,
-        dynamicBlock: {},
+        blockDuration: 5 * 60,
+        dynamicBlock: {
+          points: 5,
+        },
       }),
     );
     this.bot.use(
@@ -37,12 +39,50 @@ export class Bot {
         points: (24 * 60 * 60) / 10,
         duration: 24 * 60 * 60,
         blockDuration: 60 * 60,
-        dynamicBlock: {},
+        dynamicBlock: {
+          points: 5,
+        },
       }),
     );
 
-    this.bot.command('ping', pingCommand);
-    this.bot.command('auth', authCommand);
+    const commands: (BotCommand & { fn: any })[] = [];
+    if (ENV.AUTH_SECRET) {
+      commands.push({
+        command: 'auth_secret',
+        description: 'Authenticate',
+        fn: authSecret,
+      });
+    }
+    if (ENV_AUTH_OIDC) {
+      commands.push({
+        command: 'auth_oidc',
+        description: 'Authenticate',
+        fn: authSecret,
+      });
+    }
+    commands.push(
+      {
+        command: 'ping',
+        description: 'Pong',
+        fn: authSecret,
+      },
+      {
+        command: 'start',
+        description: 'start',
+        fn: authSecret,
+      },
+      {
+        command: 'help',
+        description: 'help',
+        fn: authSecret,
+      },
+    );
+
+    commands.forEach((command) => {
+      this.bot.command(command.command, command.fn);
+    });
+
+    this.bot.telegram.setMyCommands(commands);
   }
 
   listen(): void {
